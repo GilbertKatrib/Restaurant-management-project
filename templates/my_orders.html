@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders</title>
+</head>
+<body>
+
+    <h1>My Orders</h1>
+
+    <nav>
+        <a href="{{ url_for('index') }}">Home</a> |
+        <a href="{{ url_for('cart') }}">Cart ({{ cart_count }})</a> |
+        <a href="{{ url_for('track') }}">Track Order</a> |
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </nav>
+
+    <hr>
+
+    {% if orders %}
+
+        {% for order in orders %}
+
+            <div>
+                <h2>Order {{ order['order_no'] }}</h2>
+
+                <p>
+                    <strong>Date:</strong>
+                    {{ order['created_at'] }}
+                </p>
+
+                <p>
+                    <strong>Order Type:</strong>
+                    {{ order['order_type'] }}
+                </p>
+
+                <p>
+                    <strong>Status:</strong>
+                    {{ order['status'] }}
+                </p>
+
+                <p>
+                    <strong>Total:</strong>
+                    {{ "%.0f"|format(order['total']) }}
+                </p>
+
+                <p>
+                    <a href="{{ url_for('track', order_no=order['order_no']) }}">
+                        Track this order
+                    </a>
+                </p>
+            </div>
+
+            <hr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <h2>No orders yet.</h2>
+
+        <p>
+            <a href="{{ url_for('index') }}">Browse the menu</a>
+        </p>
+
+    {% endif %}
+
+</body>
+</html>
