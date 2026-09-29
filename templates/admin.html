@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Admin Dashboard</title>
+</head>
+<body>
+
+    <h1>Restaurant Admin Dashboard</h1>
+
+    <nav>
+        <a href="{{ url_for('index') }}">Restaurant Home</a> |
+        <a href="{{ url_for('admin_logout') }}">Logout</a>
+    </nav>
+
+    <hr>
+
+    <h2>Dashboard Statistics</h2>
+
+    <p><strong>Total Orders:</strong> {{ stats['orders'] }}</p>
+    <p><strong>Pending Orders:</strong> {{ stats['pending'] }}</p>
+    <p><strong>Completed Sales:</strong> {{ "%.0f"|format(stats['sales']) }}</p>
+    <p><strong>Customers:</strong> {{ stats['customers'] }}</p>
+
+    <hr>
+
+    <h2>Orders</h2>
+
+    {% if orders %}
+        {% for order in orders %}
+
+            <div>
+                <h3>{{ order['order_no'] }}</h3>
+
+                <p>
+                    <strong>Customer:</strong>
+                    {{ order['customer_name'] }}
+                </p>
+
+                <p>
+                    <strong>Phone:</strong>
+                    {{ order['phone'] }}
+                </p>
+
+                <p>
+                    <strong>Type:</strong>
+                    {{ order['order_type'] }}
+                </p>
+
+                {% if order['table_no'] %}
+                    <p>
+                        <strong>Table:</strong>
+                        {{ order['table_no'] }}
+                    </p>
+                {% endif %}
+
+                {% if order['address'] %}
+                    <p>
+                        <strong>Address:</strong>
+                        {{ order['address'] }}
+                    </p>
+                {% endif %}
+
+                <p>
+                    <strong>Total:</strong>
+                    {{ "%.0f"|format(order['total']) }}
+                </p>
+
+                <p>
+                    <strong>Current Status:</strong>
+                    {{ order['status'] }}
+                </p>
+
+                <form method="POST"
+                      action="{{ url_for('order_status', order_id=order['id']) }}">
+
+                    <label for="status_{{ order['id'] }}">
+                        Change Status:
+                    </label>
+
+                    <select id="status_{{ order['id'] }}" name="status">
+
+                        <option value="Received"
+                            {% if order['status'] == 'Received' %}selected{% endif %}>
+                            Received
+                        </option>
+
+                        <option value="Preparing"
+                            {% if order['status'] == 'Preparing' %}selected{% endif %}>
+                            Preparing
+                        </option>
+
+                        <option value="Ready"
+                            {% if order['status'] == 'Ready' %}selected{% endif %}>
+                            Ready
+                        </option>
+
+                        <option value="Completed"
+                            {% if order['status'] == 'Completed' %}selected{% endif %}>
+                            Completed
+                        </option>
+
+                        <option value="Cancelled"
+                            {% if order['status'] == 'Cancelled' %}selected{% endif %}>
+                            Cancelled
+                        </option>
+
+                    </select>
+
+                    <button type="submit">Update Status</button>
+
+                </form>
+
+            </div>
+
+            <hr>
+
+        {% endfor %}
+    {% else %}
+        <p>No orders yet.</p>
+    {% endif %}
+
+    <hr>
+
+    <h2>Table Bookings</h2>
+
+    {% if bookings %}
+
+        {% for booking in bookings %}
+
+            <div>
+                <h3>{{ booking['customer_name'] }}</h3>
+
+                <p>
+                    <strong>Phone:</strong>
+                    {{ booking['phone'] }}
+                </p>
+
+                <p>
+                    <strong>Date:</strong>
+                    {{ booking['booking_date'] }}
+                </p>
+
+                <p>
+                    <strong>Time:</strong>
+                    {{ booking['booking_time'] }}
+                </p>
+
+                <p>
+                    <strong>Guests:</strong>
+                    {{ booking['guests'] }}
+                </p>
+
+                <p>
+                    <strong>Status:</strong>
+                    {{ booking['status'] }}
+                </p>
+
+                <form method="POST"
+                      action="{{ url_for('booking_status', booking_id=booking['id']) }}">
+
+                    <select name="status">
+
+                        <option value="Pending"
+                            {% if booking['status'] == 'Pending' %}selected{% endif %}>
+                            Pending
+                        </option>
+
+                        <option value="Confirmed"
+                            {% if booking['status'] == 'Confirmed' %}selected{% endif %}>
+                            Confirmed
+                        </option>
+
+                        <option value="Completed"
+                            {% if booking['status'] == 'Completed' %}selected{% endif %}>
+                            Completed
+                        </option>
+
+                        <option value="Cancelled"
+                            {% if booking['status'] == 'Cancelled' %}selected{% endif %}>
+                            Cancelled
+                        </option>
+
+                    </select>
+
+                    <button type="submit">Update Booking</button>
+
+                </form>
+
+            </div>
+
+            <hr>
+
+        {% endfor %}
+
+    {% else %}
+        <p>No bookings yet.</p>
+    {% endif %}
+
+    <hr>
+
+    <h2>Menu Management</h2>
+
+    <h3>Add Menu Item</h3>
+
+    <form method="POST" action="{{ url_for('menu_add') }}">
+
+        <p>
+            <label for="name">Item Name:</label><br>
+            <input type="text" id="name" name="name" required>
+        </p>
+
+        <p>
+            <label for="category">Category:</label><br>
+            <input type="text" id="category" name="category" required>
+        </p>
+
+        <p>
+            <label for="description">Description:</label><br>
+            <textarea id="description" name="description"></textarea>
+        </p>
+
+        <p>
+            <label for="price">Price:</label><br>
+            <input type="number" id="price" name="price"
+                   min="0" step="0.01" required>
+        </p>
+
+        <button type="submit">Add Menu Item</button>
+
+    </form>
+
+    <h3>Existing Menu</h3>
+
+    {% for item in menu %}
+
+        <div>
+            <strong>{{ item['name'] }}</strong>
+
+            — {{ item['category'] }}
+
+            — {{ "%.0f"|format(item['price']) }}
+
+            {% if item['available'] %}
+                <strong>Available</strong>
+            {% else %}
+                <strong>Unavailable</strong>
+            {% endif %}
+
+            <form method="POST"
+                  action="{{ url_for('menu_toggle', item_id=item['id']) }}"
+                  style="display:inline;">
+
+                <button type="submit">
+                    {% if item['available'] %}
+                        Disable
+                    {% else %}
+                        Enable
+                    {% endif %}
+                </button>
+
+            </form>
+        </div>
+
+        <hr>
+
+    {% endfor %}
+
+</body>
+</html>
