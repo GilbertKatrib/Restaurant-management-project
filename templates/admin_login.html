@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Login</title>
+</head>
+<body>
+
+    <h1>Restaurant Staff Login</h1>
+
+    <nav>
+        <a href="{{ url_for('index') }}">Home</a>
+    </nav>
+
+    <hr>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p><strong>{{ message }}</strong></p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('admin_login') }}">
+
+        <p>
+            <label for="username">Username:</label><br>
+            <input type="text" id="username" name="username" required>
+        </p>
+
+        <p>
+            <label for="password">Password:</label><br>
+            <input type="password" id="password" name="password" required>
+        </p>
+
+        <button type="submit">Staff Login</button>
+
+    </form>
+
+</body>
+</html>
