@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+</head>
+<body>
+
+    <h1>Checkout</h1>
+
+    <nav>
+        <a href="{{ url_for('index') }}">Home</a> |
+        <a href="{{ url_for('cart') }}">Cart ({{ cart_count }})</a> |
+        <a href="{{ url_for('track') }}">Track Order</a>
+    </nav>
+
+    <hr>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p><strong>{{ message }}</strong></p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <h2>Your Order</h2>
+
+    {% for x in items %}
+        <p>
+            <strong>{{ x['item']['name'] }}</strong>
+            × {{ x['qty'] }}
+            — {{ "%.0f"|format(x['subtotal']) }}
+        </p>
+    {% endfor %}
+
+    <h3>Total: {{ "%.0f"|format(total) }}</h3>
+
+    <hr>
+
+    <h2>Customer Details</h2>
+
+    <form method="POST" action="{{ url_for('checkout') }}">
+
+        <p>
+            <label for="name">Full Name:</label><br>
+            <input type="text" id="name" name="name"
+                   value="{{ session.get('customer_name', '') }}"
+                   required>
+        </p>
+
+        <p>
+            <label for="phone">Phone Number:</label><br>
+            <input type="tel" id="phone" name="phone"
+                   value="{{ session.get('customer_phone', '') }}"
+                   required>
+        </p>
+
+        <p>
+            <label for="order_type">Order Type:</label><br>
+            <select id="order_type" name="order_type" required>
+                <option value="Dine-in">Dine-in</option>
+                <option value="Takeaway">Takeaway</option>
+                <option value="Delivery">Delivery</option>
+            </select>
+        </p>
+
+        <p>
+            <label for="table_no">Table Number:</label><br>
+            <input type="text" id="table_no" name="table_no">
+            <br>
+            <small>Required for dine-in orders.</small>
+        </p>
+
+        <p>
+            <label for="address">Delivery Address:</label><br>
+            <textarea id="address" name="address" rows="4"></textarea>
+            <br>
+            <small>Required for delivery orders.</small>
+        </p>
+
+        <button type="submit">Place Order</button>
+
+    </form>
+
+    <p>
+        <a href="{{ url_for('cart') }}">Back to Cart</a>
+    </p>
+
+</body>
+                                                   </html>
