@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart</title>
+</head>
+<body>
+
+    <header>
+        <h1>Your Order</h1>
+
+        <nav>
+            <a href="{{ url_for('index') }}">Home</a> |
+            <a href="{{ url_for('cart') }}">Cart ({{ cart_count }})</a> |
+            <a href="{{ url_for('track') }}">Track Order</a> |
+            <a href="{{ url_for('book') }}">Book a Table</a>
+        </nav>
+    </header>
+
+    <hr>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p><strong>{{ message }}</strong></p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if items %}
+
+        <h2>Items in Your Cart</h2>
+
+        <form method="POST" action="{{ url_for('update_cart') }}">
+
+            {% for x in items %}
+
+                <div>
+                    <h3>{{ x['item']['name'] }}</h3>
+
+                    <p>
+                        Price:
+                        {{ "%.0f"|format(x['item']['price']) }}
+                    </p>
+
+                    <label>
+                        Quantity:
+                        <input
+                            type="number"
+                            name="qty_{{ x['item']['id'] }}"
+                            value="{{ x['qty'] }}"
+                            min="0"
+                            max="99">
+                    </label>
+
+                    <p>
+                        Subtotal:
+                        {{ "%.0f"|format(x['subtotal']) }}
+                    </p>
+                </div>
+
+                <hr>
+
+            {% endfor %}
+
+            <button type="submit">Update Cart</button>
+
+        </form>
+
+        <h2>
+            Total:
+            {{ "%.0f"|format(total) }}
+        </h2>
+
+        <p>
+            <a href="{{ url_for('checkout') }}">
+                <button type="button">Proceed to Checkout</button>
+            </a>
+        </p>
+
+        <form method="POST" action="{{ url_for('clear_cart') }}">
+            <button type="submit">Clear Cart</button>
+        </form>
+
+    {% else %}
+
+        <h2>Your cart is empty.</h2>
+
+        <p>
+            <a href="{{ url_for('index') }}">Go back to the menu</a>
+        </p>
+
+    {% endif %}
+
+</body>
+</html>
