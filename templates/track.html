@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Order</title>
+</head>
+<body>
+
+    <h1>Track Your Order</h1>
+
+    <nav>
+        <a href="{{ url_for('index') }}">Home</a> |
+        <a href="{{ url_for('cart') }}">Cart ({{ cart_count }})</a> |
+        <a href="{{ url_for('my_orders') }}">My Orders</a>
+    </nav>
+
+    <hr>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p><strong>{{ message }}</strong></p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('track') }}">
+        <p>
+            <label for="order_no">Order Number:</label><br>
+            <input type="text" id="order_no" name="order_no"
+                   placeholder="Example: ORD-20260929120000-1"
+                   value="{{ request.values.get('order_no', '') }}"
+                   required>
+        </p>
+
+        <button type="submit">Track Order</button>
+    </form>
+
+    {% if order %}
+
+        <hr>
+
+        <h2>Order Found</h2>
+
+        <p>
+            <strong>Order Number:</strong>
+            {{ order['order_no'] }}
+        </p>
+
+        <p>
+            <strong>Customer:</strong>
+            {{ order['customer_name'] }}
+        </p>
+
+        <p>
+            <strong>Order Type:</strong>
+            {{ order['order_type'] }}
+        </p>
+
+        <p>
+            <strong>Status:</strong>
+            {{ order['status'] }}
+        </p>
+
+        <p>
+            <strong>Total:</strong>
+            {{ "%.0f"|format(order['total']) }}
+        </p>
+
+        <h3>Items</h3>
+
+        {% for item in items %}
+            <p>
+                {{ item['item_name'] }}
+                × {{ item['quantity'] }}
+                —
+                {{ "%.0f"|format(item['subtotal']) }}
+            </p>
+        {% endfor %}
+
+    {% endif %}
+
+    <hr>
+
+    <p>
+        <a href="{{ url_for('index') }}">Back to Menu</a>
+    </p>
+
+</body>
+</html>
