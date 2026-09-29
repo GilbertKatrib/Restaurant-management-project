@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Successful</title>
+</head>
+<body>
+
+    <h1>Order Placed Successfully!</h1>
+
+    <hr>
+
+    <p>Thank you for your order.</p>
+
+    <h2>Order Details</h2>
+
+    <p>
+        <strong>Order Number:</strong>
+        {{ order_no }}
+    </p>
+
+    <p>
+        <strong>Total:</strong>
+        {{ "%.0f"|format(total) }}
+    </p>
+
+    <p>
+        Keep your order number so you can check your order status later.
+    </p>
+
+    <hr>
+
+    <p>
+        <a href="{{ url_for('track') }}">Track Your Order</a>
+    </p>
+
+    <p>
+        <a href="{{ url_for('index') }}">Back to Restaurant</a>
+    </p>
+
+</body>
+</html>
