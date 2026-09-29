@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
+from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 from pathlib import Path
 from datetime import datetime
@@ -80,7 +81,7 @@ def init_db():
     """)
     if conn.execute("SELECT COUNT(*) FROM staff").fetchone()[0] == 0:
         conn.execute("INSERT INTO staff(username,password) VALUES(?,?)",
-                     ("admin", "admin123"))
+             ("admin", generate_password_hash("admin123")))
     if conn.execute("SELECT COUNT(*) FROM menu_items").fetchone()[0] == 0:
         sample = [
             ("Chicken Burger", "Main", "Grilled chicken, lettuce and house sauce", 12000),
@@ -191,7 +192,7 @@ def register():
         try:
             cur = conn.execute(
                 "INSERT INTO customers(name,phone,email,password,created_at) VALUES(?,?,?,?,?)",
-                (name, phone, email, password, datetime.now().isoformat(timespec="seconds")))
+                (name, phone, email, generate_password_hash(password), datetime.now().isoformat(timespec="seconds")))
             conn.commit()
             session["customer_id"] = cur.lastrowid
             session["customer_name"] = name
@@ -210,10 +211,10 @@ def login():
     if request.method == "POST":
         phone, password = request.form["phone"].strip(), request.form["password"]
         conn = db()
-        row = conn.execute("SELECT * FROM customers WHERE phone=? AND password=?",
-                           (phone, password)).fetchone()
+        row = conn.execute("SELECT * FROM customers WHERE phone=?,
+                           (phone,)).fetchone()
         conn.close()
-        if row:
+        if row and check_password_hash(row["password"], password):
             session["customer_id"] = row["id"]
             session["customer_name"] = row["name"]
             session["customer_phone"] = row["phone"]
@@ -330,10 +331,10 @@ def staff_required():
 def admin_login():
     if request.method == "POST":
         conn = db()
-        row = conn.execute("SELECT * FROM staff WHERE username=? AND password=?",
-                           (request.form["username"], request.form["password"])).fetchone()
+        row = conn.execute("SELECT * FROM staff WHERE username=?",
+                   (request.form["username"],)).fetchone()
         conn.close()
-        if row:
+        if row and check_password_hash(row["password"], request.form["password"]):
             session["staff"] = True
             return redirect(url_for("admin"))
         flash("Invalid staff login.", "error")
