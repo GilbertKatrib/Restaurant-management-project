@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a Table</title>
+</head>
+<body>
+
+    <h1>Book a Table</h1>
+
+    <nav>
+        <a href="{{ url_for('index') }}">Home</a> |
+        <a href="{{ url_for('cart') }}">Cart ({{ cart_count }})</a> |
+        <a href="{{ url_for('track') }}">Track Order</a>
+    </nav>
+
+    <hr>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p><strong>{{ message }}</strong></p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('book') }}">
+
+        <p>
+            <label for="name">Full Name:</label><br>
+            <input type="text" id="name" name="name"
+                   value="{{ session.get('customer_name', '') }}"
+                   required>
+        </p>
+
+        <p>
+            <label for="phone">Phone Number:</label><br>
+            <input type="tel" id="phone" name="phone"
+                   value="{{ session.get('customer_phone', '') }}"
+                   required>
+        </p>
+
+        <p>
+            <label for="date">Booking Date:</label><br>
+            <input type="date" id="date" name="date" required>
+        </p>
+
+        <p>
+            <label for="time">Booking Time:</label><br>
+            <input type="time" id="time" name="time" required>
+        </p>
+
+        <p>
+            <label for="guests">Number of Guests:</label><br>
+            <input type="number" id="guests" name="guests"
+                   min="1" max="50" required>
+        </p>
+
+        <button type="submit">Submit Booking</button>
+
+    </form>
+
+    <p>
+        The restaurant will review your booking and confirm it.
+    </p>
+
+</body>
+</html>
